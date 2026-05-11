@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -922,7 +922,7 @@
       'whatsapp://send?phone=' + NUMBER + '&text=' + MSG,           // Native app scheme
       'intent://send?phone=' + NUMBER + '&text=' + MSG + '#Intent;scheme=whatsapp;package=com.whatsapp;end',  // Android intent
       'https://api.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG,  // API url
-      'https://wa.me/' + NUMBER + '?text=' + MSG                    // Standard
+      'https://api.whatsapp.com/send/?phone=' + NUMBER + '&text=' + MSG + '&type=phone_number&app_absent=0'                    // Standard
     ];
 
     if (isMobile) {
