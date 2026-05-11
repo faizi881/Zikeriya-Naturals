@@ -899,5 +899,79 @@
 })();
 </script>
 
+
 </body>
-</html>
+<script>
+(function() {
+  var NUMBER = '923205297998';
+  var MSG = encodeURIComponent('Hello! Main RootRevive Hair Growth Organic Oil order karna chahta hun 🌿 Price: Rs.1499 - Please confirm!');
+
+  function openWhatsApp(e) {
+    var el = e ? e.target.closest('a') : null;
+    if (e && el) {
+      var href = el.getAttribute('href') || '';
+      if (href.indexOf('wa.me') === -1 && href.indexOf('whatsapp') === -1) return;
+      e.preventDefault();
+    }
+
+    var ua = navigator.userAgent || '';
+    var isMobile = /android|iphone|ipad|ipod/i.test(ua);
+
+    // Try all possible WhatsApp URL schemes in order
+    var urls = [
+      'whatsapp://send?phone=' + NUMBER + '&text=' + MSG,           // Native app scheme
+      'intent://send?phone=' + NUMBER + '&text=' + MSG + '#Intent;scheme=whatsapp;package=com.whatsapp;end',  // Android intent
+      'https://api.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG,  // API url
+      'https://wa.me/' + NUMBER + '?text=' + MSG                    // Standard
+    ];
+
+    if (isMobile) {
+      // Try native app first
+      var tried = 0;
+      function tryNext() {
+        if (tried >= urls.length) return;
+        var url = urls[tried++];
+        
+        // Use iframe trick to try app open without leaving page
+        if (url.indexOf('whatsapp://') === 0 || url.indexOf('intent://') === 0) {
+          var start = Date.now();
+          var iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = url;
+          document.body.appendChild(iframe);
+          setTimeout(function() {
+            document.body.removeChild(iframe);
+            // If app didn't open (still on page after 1.5s), try next
+            if (Date.now() - start < 2000) tryNext();
+          }, 1500);
+        } else {
+          window.location.href = url;
+        }
+      }
+      
+      // Primary: direct location change with whatsapp:// scheme
+      window.location.href = 'whatsapp://send?phone=' + NUMBER + '&text=' + MSG;
+      
+      // Fallback after 2s if app didn't open
+      setTimeout(function() {
+        window.location.href = 'https://api.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG;
+      }, 2000);
+
+    } else {
+      // Desktop
+      window.open('https://web.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG, '_blank');
+    }
+  }
+
+  // Intercept all wa.me links
+  document.addEventListener('click', function(e) {
+    var el = e.target.closest('a');
+    if (!el) return;
+    var href = el.getAttribute('href') || '';
+    if (href.indexOf('wa.me') !== -1 || href.indexOf('whatsapp') !== -1) {
+      openWhatsApp(e);
+    }
+  });
+})();
+</script>
+</body>
