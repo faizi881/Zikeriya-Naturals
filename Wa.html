@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Pe Order Karein</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #0d2b0d, #1a4a1a);
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+  }
+  .card {
+    background: white; border-radius: 28px;
+    padding: 40px 32px; max-width: 380px; width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  .wa-logo { font-size: 4rem; margin-bottom: 12px; }
+  h1 { font-size: 1.4rem; color: #1a3a1a; margin-bottom: 8px; font-weight: 800; }
+  .subtitle { font-size: 0.88rem; color: #666; line-height: 1.6; margin-bottom: 24px; }
+  .number-box {
+    background: #f0f7e8; border: 2px dashed #25D366;
+    border-radius: 14px; padding: 16px;
+    font-size: 1.6rem; font-weight: 900;
+    color: #1a3a1a; margin-bottom: 20px;
+    letter-spacing: 2px;
+  }
+  .btn {
+    display: block; width: 100%;
+    padding: 16px; border-radius: 50px;
+    font-size: 1rem; font-weight: 700;
+    border: none; cursor: pointer;
+    margin-bottom: 12px; text-decoration: none;
+    transition: transform 0.2s;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-copy { background: #25D366; color: white; }
+  .btn-copy.done { background: #128C7E; }
+  .btn-msg { background: #128C7E; color: white; }
+  .msg-preview {
+    background: #f9f9f9; border-radius: 12px;
+    padding: 12px 16px; font-size: 0.8rem;
+    color: #555; text-align: left;
+    margin-bottom: 20px; line-height: 1.6;
+    border-left: 3px solid #25D366;
+  }
+  .msg-preview strong { color: #1a3a1a; display: block; margin-bottom: 4px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
+  .steps { font-size: 0.78rem; color: #888; line-height: 1.8; margin-top: 16px; text-align: left; }
+  .steps strong { color: #25D366; }
+  .brand { margin-top: 24px; font-size: 0.75rem; color: #aaa; }
+  .brand span { color: #5db843; font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="wa-logo">💬</div>
+  <h1>WhatsApp Pe Order Karein</h1>
+  <p class="subtitle">Neeche number copy karein aur WhatsApp mein paste karein!</p>
+  <div class="number-box">0320 529 7998</div>
+  <button class="btn btn-copy" id="copyBtn" onclick="copyNum()">📋 Number Copy Karein</button>
+  <div class="msg-preview">
+    <strong>📝 Yeh message bhejein:</strong>
+    Hello! Main RootRevive Hair Growth Organic Oil order karna chahta hun 🌿 Price: Rs.1499 — Please confirm!
+  </div>
+  <button class="btn btn-msg" id="copyMsgBtn" onclick="copyMsg()">📝 Message Copy Karein</button>
+  <div class="steps">
+    <strong>Kaise order karein:</strong><br>
+    1️⃣ Upar number copy karein<br>
+    2️⃣ WhatsApp kholen<br>
+    3️⃣ New chat mein number paste karein<br>
+    4️⃣ Message bhej dein ✅
+  </div>
+  <div class="brand">🌿 <span>Zikeriya Naturals</span> — Pure by Nature</div>
+</div>
+<script>
+  var NUMBER = '03205297998';
+  var MSG = 'Hello! Main RootRevive Hair Growth Organic Oil order karna chahta hun 🌿 Price: Rs.1499 - Please confirm!';
+  var FULL = '923205297998';
+
+  window.addEventListener('load', function() {
+    setTimeout(function() {
+      window.location.href = 'whatsapp://send?phone=' + FULL + '&text=' + encodeURIComponent(MSG);
+    }, 500);
+    setTimeout(function() {
+      window.location.href = 'intent://send?phone=' + FULL + '&text=' + encodeURIComponent(MSG) + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
+    }, 2000);
+  });
+
+  function copyNum() {
+    copyText(NUMBER, 'copyBtn', '✅ Copy Ho Gaya!', '📋 Number Copy Karein');
+  }
+  function copyMsg() {
+    copyText(MSG, 'copyMsgBtn', '✅ Copy Ho Gaya!', '📝 Message Copy Karein');
+  }
+  function copyText(text, id, ok, def) {
+    var btn = document.getElementById(id);
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(function() {
+        btn.textContent = ok; btn.classList.add('done');
+        setTimeout(function() { btn.textContent = def; btn.classList.remove('done'); }, 3000);
+      });
+    } else {
+      var el = document.createElement('textarea');
+      el.value = text; document.body.appendChild(el);
+      el.select(); document.execCommand('copy');
+      document.body.removeChild(el);
+      btn.textContent = ok; btn.classList.add('done');
+      setTimeout(function() { btn.textContent = def; btn.classList.remove('done'); }, 3000);
+    }
+  }
+</script>
+</body>
+</html>
