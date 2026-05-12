@@ -921,6 +921,23 @@
     return /iphone|ipad|ipod/i.test(navigator.userAgent);
   }
 
+  // Simulate a click on a link element (works better in restricted webviews like TikTok)
+  function clickLinkDirectly(url) {
+    try {
+      var tempLink = document.createElement('a');
+      tempLink.href = url;
+      tempLink.style.display = 'none';
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      setTimeout(function() {
+        document.body.removeChild(tempLink);
+      }, 100);
+    } catch (e) {
+      // Fallback to window.open if click simulation fails
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }
+  }
+
   // Open WhatsApp with proper handling
   function openWhatsApp() {
     var waMeUrl = 'https://wa.me/' + PHONE_NUMBER + '?text=' + ENCODED_MESSAGE;
@@ -928,26 +945,29 @@
     var appUrl = 'whatsapp://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE;
 
     if (isTikTokBrowser()) {
-      // TikTok in-app browser: try to open the WhatsApp app directly (no intermediate redirect).
-      // Use intent scheme on Android, app-scheme on iOS, and fall back to wa.me if app isn't available.
+      // TikTok in-app browser: bypass webview restrictions by using window.open() + link simulation
+      // This avoids the "Action can't be completed" error and token generation
       if (isMobile()) {
         if (isIOS()) {
-          // iOS: user gesture -> try app scheme first, then fallback to wa.me
-          window.location.href = appUrl;
-          setTimeout(function() {
-            window.location.href = waMeUrl;
-          }, 1200);
+          // iOS TikTok: window.open with app scheme (most reliable in TikTok iOS webview)
+          var iosWindow = window.open(appUrl, '_self');
+          if (!iosWindow) {
+            // If window.open fails, fallback to wa.me after a short delay
+            setTimeout(function() {
+              window.location.href = waMeUrl;
+            }, 500);
+          }
         } else {
-          // Android (TikTok): use intent URI to launch WhatsApp directly from the webview
-          var intentUrl = 'intent://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
-          window.location.href = intentUrl;
-          // Short fallback to app-scheme then to wa.me if intent isn't handled
+          // Android TikTok: use link simulation to avoid location.href blocking
+          // Try app scheme first via simulated click
+          clickLinkDirectly(appUrl);
+          // Fallback to wa.me if app isn't available (timeout ensures no redirect delay)
           setTimeout(function() {
-            window.location.href = appUrl;
-          }, 600);
-          setTimeout(function() {
-            window.location.href = waMeUrl;
-          }, 2000);
+            var waMeWindow = window.open(waMeUrl, '_blank', 'noopener,noreferrer');
+            if (!waMeWindow) {
+              window.location.href = waMeUrl;
+            }
+          }, 1800);
         }
       } else {
         // Non-mobile TikTok (rare) — preserve existing desktop behavior
@@ -957,7 +977,7 @@
     }
 
     if (isMobile()) {
-      // Mobile: try app first, fallback to web
+      // Mobile (non-TikTok): try app first, fallback to web
       if (isIOS()) {
         // iOS: direct app scheme
         window.location.href = appUrl;
@@ -999,7 +1019,6 @@
 })();
 </script>
 </body>
-
 
 
 
