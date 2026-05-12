@@ -921,23 +921,6 @@
     return /iphone|ipad|ipod/i.test(navigator.userAgent);
   }
 
-  // Simulate a click on a link element (works better in restricted webviews like TikTok)
-  function clickLinkDirectly(url) {
-    try {
-      var tempLink = document.createElement('a');
-      tempLink.href = url;
-      tempLink.style.display = 'none';
-      document.body.appendChild(tempLink);
-      tempLink.click();
-      setTimeout(function() {
-        document.body.removeChild(tempLink);
-      }, 100);
-    } catch (e) {
-      // Fallback to window.open if click simulation fails
-      window.open(url, '_blank', 'noopener,noreferrer');
-    }
-  }
-
   // Open WhatsApp with proper handling
   function openWhatsApp() {
     var waMeUrl = 'https://wa.me/' + PHONE_NUMBER + '?text=' + ENCODED_MESSAGE;
@@ -945,32 +928,16 @@
     var appUrl = 'whatsapp://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE;
 
     if (isTikTokBrowser()) {
-      // TikTok in-app browser: bypass webview restrictions by using window.open() + link simulation
-      // This avoids the "Action can't be completed" error and token generation
+      // TikTok in-app browser: uses wa.me (web URL) instead of app schemes
+      // This avoids TikTok's "Action can't be completed" error and intermediate redirects
+      // WHY: TikTok blocks app-scheme navigation but allows web URLs
+      // wa.me automatically opens WhatsApp app on mobile (if installed)
       if (isMobile()) {
-        if (isIOS()) {
-          // iOS TikTok: window.open with app scheme (most reliable in TikTok iOS webview)
-          var iosWindow = window.open(appUrl, '_self');
-          if (!iosWindow) {
-            // If window.open fails, fallback to wa.me after a short delay
-            setTimeout(function() {
-              window.location.href = waMeUrl;
-            }, 500);
-          }
-        } else {
-          // Android TikTok: use link simulation to avoid location.href blocking
-          // Try app scheme first via simulated click
-          clickLinkDirectly(appUrl);
-          // Fallback to wa.me if app isn't available (timeout ensures no redirect delay)
-          setTimeout(function() {
-            var waMeWindow = window.open(waMeUrl, '_blank', 'noopener,noreferrer');
-            if (!waMeWindow) {
-              window.location.href = waMeUrl;
-            }
-          }, 1800);
-        }
+        // Use direct window.location.href with wa.me web URL (no app schemes)
+        // This bypasses TikTok's intermediate redirect behavior completely
+        window.location.href = waMeUrl;
       } else {
-        // Non-mobile TikTok (rare) — preserve existing desktop behavior
+        // Non-mobile TikTok (rare) — open web WhatsApp
         window.open(webUrl, '_blank', 'noopener,noreferrer');
       }
       return;
