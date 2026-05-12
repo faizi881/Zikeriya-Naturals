@@ -781,6 +781,7 @@
 </footer>
 
 
+
 <style>
 /* ── CUSTOM CURSOR ── */
 *, *::before, *::after { cursor: none !important; }
@@ -922,23 +923,34 @@
   }
 
   // Open WhatsApp with proper handling
-  function openWhatsApp() {
+  function openWhatsApp(sourceUrl) {
     var waMeUrl = 'https://wa.me/' + PHONE_NUMBER + '?text=' + ENCODED_MESSAGE;
     var webUrl = 'https://web.whatsapp.com/send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE;
     var appUrl = 'whatsapp://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE;
+    var targetUrl = sourceUrl || waMeUrl;
 
     if (isTikTokBrowser()) {
-      // TikTok in-app browser: uses wa.me (web URL) instead of app schemes
-      // This avoids TikTok's "Action can't be completed" error and intermediate redirects
-      // WHY: TikTok blocks app-scheme navigation but allows web URLs
-      // wa.me automatically opens WhatsApp app on mobile (if installed)
-      if (isMobile()) {
-        // Use direct window.location.href with wa.me web URL (no app schemes)
-        // This bypasses TikTok's intermediate redirect behavior completely
-        window.location.href = waMeUrl;
-      } else {
-        // Non-mobile TikTok (rare) — open web WhatsApp
-        window.open(webUrl, '_blank', 'noopener,noreferrer');
+      // TikTok webview: open the existing WhatsApp link in a new tab/window first.
+      // This reduces app-scheme blocking and avoids extra intermediate redirects.
+      var popup = window.open('about:blank', '_blank', 'noopener,noreferrer');
+      if (popup) {
+        popup.location.href = targetUrl;
+        return;
+      }
+
+      // If popup is blocked, use an anchor-click fallback in the same user gesture.
+      try {
+        var a = document.createElement('a');
+        a.href = targetUrl;
+        a.target = '_blank';
+        a.rel = 'noopener noreferrer';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (err) {
+        // Last-resort fallback for restrictive webviews.
+        window.location.href = targetUrl;
       }
       return;
     }
@@ -972,7 +984,7 @@
     var link = e.target.closest('a[href*="whatsapp"], a[href*="wa.me"], a[href*="api.whatsapp"]');
     if (link) {
       e.preventDefault();
-      openWhatsApp();
+      openWhatsApp(link.href);
     }
   });
 
