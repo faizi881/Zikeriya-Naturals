@@ -1,4 +1,4 @@
-﻿﻿<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -397,7 +397,7 @@
 <body>
 
 <!-- FLOATING WHATSAPP BUTTON -->
-<a href="https://wa.me/923205297998?text=Hello%21%20I%20want%20to%20order%20RootRevive%20Hair%20Growth%20Organic%20Oil%20%F0%9F%8C%BF" class="wa-float" target="_blank">
+<a href="https://wa.me/923205297998?text=Hello%21+Main+RootRevive+Hair+Growth+Organic+Oil+order+karna+chahta+hun+%F0%9F%8C%BF+Price%3A+Rs.1499+-+Please+confirm%21" class="wa-float" target="_blank" rel="noopener noreferrer">
   <span class="wa-float-icon">💬</span> Order on WhatsApp
 </a>
 
@@ -409,7 +409,7 @@
       <span>Pure by Nature, Made for You</span>
     </div>
   </div>
-  <a href="https://wa.me/923205297998?text=Hello%21%20I%20want%20to%20order%20RootRevive%20Hair%20Growth%20Organic%20Oil%20%F0%9F%8C%BF" class="nav-wa-btn" target="_blank">
+  <a href="https://wa.me/923205297998?text=Hello%21+Main+RootRevive+Hair+Growth+Organic+Oil+order+karna+chahta+hun+%F0%9F%8C%BF+Price%3A+Rs.1499+-+Please+confirm%21" class="nav-wa-btn" target="_blank" rel="noopener noreferrer">
     💬 Order Now
   </a>
 </nav>
@@ -502,7 +502,7 @@
         <span class="price-new">Rs. 1,499</span>
         <span class="price-save">Save Rs. 101 🎉</span>
       </div>
-      <a href="https://wa.me/923205297998?text=Hello%21%20I%20want%20to%20order%20RootRevive%20Hair%20Growth%20Organic%20Oil%20%F0%9F%8C%BF%20Price%3A%20Rs.1499%20-%20Please%20confirm%20my%20order!" class="order-btn" target="_blank">
+      <a href="https://wa.me/923205297998?text=Hello%21+Main+RootRevive+Hair+Growth+Organic+Oil+order+karna+chahta+hun+%F0%9F%8C%BF+Price%3A+Rs.1499+-+Please+confirm%21" class="order-btn" target="_blank" rel="noopener noreferrer">
         💬 Order on WhatsApp — Rs. 1,499
       </a>
     </div>
@@ -634,7 +634,7 @@
         ctx.save();
         ctx.globalAlpha = Math.max(0, Math.min(1, alpha));
         ctx.drawImage(img, dx, dy, dw, dh);
-        ctx.restore();
+        ctx.restore(); 
       }
 
       function setDot(i) {
@@ -903,75 +903,103 @@
 </body>
 <script>
 (function() {
-  var NUMBER = '923205297998';
-  var MSG = encodeURIComponent('Hello! Main RootRevive Hair Growth Organic Oil order karna chahta hun 🌿 Price: Rs.1499 - Please confirm!');
+  // WhatsApp configuration
+  var PHONE_NUMBER = '923205297998';
+  var MESSAGE = 'Hello! Main RootRevive Hair Growth Organic Oil order karna chahta hun 🌿 Price: Rs.1499 - Please confirm!';
+  var ENCODED_MESSAGE = encodeURIComponent(MESSAGE);
 
-  function openWhatsApp(e) {
-    var el = e ? e.target.closest('a') : null;
-    if (e && el) {
-      var href = el.getAttribute('href') || '';
-      if (href.indexOf('wa.me') === -1 && href.indexOf('whatsapp') === -1) return;
-      e.preventDefault();
+  // Detect environment
+  function isMobile() {
+    return /android|iphone|ipad|ipod/i.test(navigator.userAgent);
+  }
+
+  function isTikTokBrowser() {
+    return /TikTok/i.test(navigator.userAgent) || /musical\.ly/i.test(navigator.userAgent);
+  }
+
+  function isIOS() {
+    return /iphone|ipad|ipod/i.test(navigator.userAgent);
+  }
+
+  // Open WhatsApp with proper handling
+  function openWhatsApp() {
+    var waMeUrl = 'https://wa.me/' + PHONE_NUMBER + '?text=' + ENCODED_MESSAGE;
+    var webUrl = 'https://web.whatsapp.com/send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE;
+    var appUrl = 'whatsapp://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE;
+
+    if (isTikTokBrowser()) {
+      // TikTok in-app browser: try to open the WhatsApp app directly (no intermediate redirect).
+      // Use intent scheme on Android, app-scheme on iOS, and fall back to wa.me if app isn't available.
+      if (isMobile()) {
+        if (isIOS()) {
+          // iOS: user gesture -> try app scheme first, then fallback to wa.me
+          window.location.href = appUrl;
+          setTimeout(function() {
+            window.location.href = waMeUrl;
+          }, 1200);
+        } else {
+          // Android (TikTok): use intent URI to launch WhatsApp directly from the webview
+          var intentUrl = 'intent://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
+          window.location.href = intentUrl;
+          // Short fallback to app-scheme then to wa.me if intent isn't handled
+          setTimeout(function() {
+            window.location.href = appUrl;
+          }, 600);
+          setTimeout(function() {
+            window.location.href = waMeUrl;
+          }, 2000);
+        }
+      } else {
+        // Non-mobile TikTok (rare) — preserve existing desktop behavior
+        window.open(webUrl, '_blank', 'noopener,noreferrer');
+      }
+      return;
     }
 
-    var ua = navigator.userAgent || '';
-    var isMobile = /android|iphone|ipad|ipod/i.test(ua);
-
-    // Try all possible WhatsApp URL schemes in order
-    var urls = [
-      'whatsapp://send?phone=' + NUMBER + '&text=' + MSG,           // Native app scheme
-      'intent://send?phone=' + NUMBER + '&text=' + MSG + '#Intent;scheme=whatsapp;package=com.whatsapp;end',  // Android intent
-      'https://api.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG,  // API url
-      'https://api.whatsapp.com/send/?phone=' + NUMBER + '&text=' + MSG + '&type=phone_number&app_absent=0'                    // Standard
-    ];
-
-    if (isMobile) {
-      // Try native app first
-      var tried = 0;
-      function tryNext() {
-        if (tried >= urls.length) return;
-        var url = urls[tried++];
-        
-        // Use iframe trick to try app open without leaving page
-        if (url.indexOf('whatsapp://') === 0 || url.indexOf('intent://') === 0) {
-          var start = Date.now();
-          var iframe = document.createElement('iframe');
-          iframe.style.display = 'none';
-          iframe.src = url;
-          document.body.appendChild(iframe);
-          setTimeout(function() {
-            document.body.removeChild(iframe);
-            // If app didn't open (still on page after 1.5s), try next
-            if (Date.now() - start < 2000) tryNext();
-          }, 1500);
-        } else {
-          window.location.href = url;
-        }
+    if (isMobile()) {
+      // Mobile: try app first, fallback to web
+      if (isIOS()) {
+        // iOS: direct app scheme
+        window.location.href = appUrl;
+        // Fallback after 2 seconds
+        setTimeout(function() {
+          window.open(waMeUrl, '_blank', 'noopener,noreferrer');
+        }, 2000);
+      } else {
+        // Android: try intent first
+        var intentUrl = 'intent://send?phone=' + PHONE_NUMBER + '&text=' + ENCODED_MESSAGE + '#Intent;scheme=whatsapp;package=com.whatsapp;end';
+        window.location.href = intentUrl;
+        // Fallback
+        setTimeout(function() {
+          window.open(waMeUrl, '_blank', 'noopener,noreferrer');
+        }, 1500);
       }
-      
-      // Primary: direct location change with whatsapp:// scheme
-      window.location.href = 'whatsapp://send?phone=' + NUMBER + '&text=' + MSG;
-      
-      // Fallback after 2s if app didn't open
-      setTimeout(function() {
-        window.location.href = 'https://api.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG;
-      }, 2000);
-
     } else {
-      // Desktop
-      window.open('https://web.whatsapp.com/send?phone=' + NUMBER + '&text=' + MSG, '_blank');
+      // Desktop: open web WhatsApp
+      window.open(webUrl, '_blank', 'noopener,noreferrer');
     }
   }
 
-  // Intercept all wa.me links
+  // Attach to all WhatsApp links
   document.addEventListener('click', function(e) {
-    var el = e.target.closest('a');
-    if (!el) return;
-    var href = el.getAttribute('href') || '';
-    if (href.indexOf('wa.me') !== -1 || href.indexOf('whatsapp') !== -1) {
-      openWhatsApp(e);
+    var link = e.target.closest('a[href*="whatsapp"], a[href*="wa.me"], a[href*="api.whatsapp"]');
+    if (link) {
+      e.preventDefault();
+      openWhatsApp();
+    }
+  });
+
+  // Also attach to buttons with data-whatsapp attribute
+  document.addEventListener('click', function(e) {
+    if (e.target.closest('[data-whatsapp]')) {
+      e.preventDefault();
+      openWhatsApp();
     }
   });
 })();
 </script>
 </body>
+
+
+
+
