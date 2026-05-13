@@ -138,7 +138,7 @@
         <p>Hum jald aapse <strong>WhatsApp</strong> pe rabta karenge. 🌿</p>
       </div>
 
-      <form id="orderForm" action="https://formspree.io/f/mpqbnlqa" method="POST">
+      <form id="orderForm" action="https://formspree.io/f/xzdowjkn" method="POST">
         <div class="form-grid">
 
           <div class="form-group">
