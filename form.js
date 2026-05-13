@@ -198,7 +198,7 @@ if (footer) {
   document.body.appendChild(section);
 }
   // ── 4. FORM SUBMIT LOGIC ──
-  var form = document.getElementById('orderForm');
+  var form = section.querySelector('#orderForm');
   var btn = document.getElementById('submitBtn');
   var success = document.getElementById('formSuccess');
 
